@@ -5,6 +5,7 @@ const { Connection, Request } = require("tedious"),
  app = express(),
  bodyParser = require("body-parser"),
  jwt = require('jsonwebtoken'),
+ cors = require('cors'),
  router = express.Router();
  PORT = process.env.PORT || 8080;
  var cambiar,comentar = false; //¿Hay un resultado con la fecha introducida?
@@ -12,7 +13,7 @@ const { Connection, Request } = require("tedious"),
  app.use(bodyParser.json());
  app.use(bodyParser.raw());
  app.use(router);
-
+app.use(cors());
 
 const pool = new sql.ConnectionPool({
     user: 'dbadmin',

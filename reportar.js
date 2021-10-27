@@ -4,6 +4,8 @@ const { Connection, Request } = require("tedious"),
  express = require("express"),
  app = express(),
  bodyParser = require("body-parser"),
+ jwt = require('jsonwebtoken'),
+ cors = require('cors'),
  router = express.Router();
  PORT = process.env.PORT || 8080;
  var cambiar,comentar = false; //¿Hay un resultado con la fecha introducida?
@@ -11,7 +13,7 @@ const { Connection, Request } = require("tedious"),
  app.use(bodyParser.json());
  app.use(bodyParser.raw());
  app.use(router);
-
+app.use(cors());
 
 const pool = new sql.ConnectionPool({
     user: 'dbadmin',
@@ -55,6 +57,18 @@ app.post("/formulario", (req, res) => {
         res.status(400).send('No se ha encontrado la fecha');
       }
   });
+});
+
+app.post("/getToken",(req, res) => {
+  console.log("Me han pedido un token");
+  console.log(req.body);
+  //9a23e74b-ea09-47cf-a6eb-46dfacd632f5 TENANT ENIRA
+  //https://login.microsoftonline.com/joactrjm/oauth2/v2.0/token
+
+});
+
+app.get("/", function(req, res) {
+  res.send('La app funciona correctamente si lees esto');
 });
 
 function modificar(recibido,res) {

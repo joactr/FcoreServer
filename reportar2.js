@@ -4,6 +4,7 @@ const { Connection, Request } = require("tedious"),
  express = require("express"),
  app = express(),
  bodyParser = require("body-parser"),
+ cors = require('cors'),
  router = express.Router();
  PORT = process.env.PORT || 8080;
  var cambiar,comentar = false; //¿Hay un resultado con la fecha introducida?
@@ -11,7 +12,7 @@ const { Connection, Request } = require("tedious"),
  app.use(bodyParser.json());
  app.use(bodyParser.raw());
  app.use(router);
-
+app.use(cors());
 
 const pool = new sql.ConnectionPool({
     user: 'dbadmin',
@@ -36,9 +37,12 @@ pool.connect(err => {
 
 app.listen(PORT, console.log(`Servidor funcionando en puerto: ${PORT}`));
 
+app.get("/", function(req, res) {
+  res.send('La app funciona correctamente si lees esto');
+});
 
 //HA RECIBIDO DATOS DEL FORMULARIO (fecha,atributo,valor,comentario)
-app.post("/formulario", (req, res) => {
+app.post("/limites", (req, res) => {
   const request = new sql.Request(pool);
   var recibido = req.body;
   if(recibido.atributo !== '' && recibido.valor !== ''){ //ES UNA OPERACIÓN DE MODIFICAR DATOS?

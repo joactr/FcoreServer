@@ -21,12 +21,12 @@
       DECLARE @compresor_offset_min NUMERIC(5);
 
       --EDITAR VALORES PARA CAMBIAR EL OFFSET
-      SET @temp_offset_max = 100;
-      SET @temp_offset_min = 100;
-      SET @vib_offset_max = 3;
-      SET @vib_offset_min = 2;
-      SET @piezas_offset_max = 6;
-      SET @piezas_offset_min = 5;
+      SET @temp_offset_max = 14;
+      SET @temp_offset_min = 14;
+      SET @vib_offset_max = 7;
+      SET @vib_offset_min = 6;
+      SET @piezas_offset_max = 4;
+      SET @piezas_offset_min = 6;
       SET @horas_offset_max = 1;
       SET @horas_offset_min = 3;
       SET @compresor_offset_max = 2;

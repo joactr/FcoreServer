@@ -59,18 +59,6 @@ app.post("/formulario", (req, res) => {
   });
 });
 
-app.post("/getToken",(req, res) => {
-  console.log("Me han pedido un token");
-  console.log(req.body);
-  //9a23e74b-ea09-47cf-a6eb-46dfacd632f5 TENANT ENIRA
-  //https://login.microsoftonline.com/joactrjm/oauth2/v2.0/token
-
-});
-
-app.get("/", function(req, res) {
-  res.send('La app funciona correctamente si lees esto');
-});
-
 function modificar(recibido,res) {
   if(recibido.atributo !== '' && recibido.valor !== ''){ //ES UNA OPERACIÓN DE MODIFICAR DATOS?
     cambiar = true;

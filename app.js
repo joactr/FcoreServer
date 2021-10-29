@@ -40,7 +40,7 @@ app.post("/limites", (req, res) => { //MODIFICA LOS LIMITES DEL TRIGGER SQL
 });
 
 app.get("/", (req, res) => {
-  res.send("Estás conectado con el back-end");
+  res.send("Estás conectado con el back-end de factorybi");
 });
 
 app.post("/incidencia", (req, res) => { //INSERTA UNA NUEVA INCIDENCIA MODIFICANDO LA TABLA

@@ -10,7 +10,6 @@ const sql = require('mssql')
  cors = require('cors'),
  router = express.Router();
  PORT = process.env.PORT || 8080;
- var cambiar,comentar = false; //¿Hay un resultado con la fecha introducida?
  app.use(bodyParser.urlencoded({ extended: true }));
  app.use(bodyParser.json());
  app.use(bodyParser.raw());
@@ -19,7 +18,7 @@ const sql = require('mssql')
 
  const pool = new sql.ConnectionPool(config);
 
-app.get('/incidencias', (req, res) => {
+app.get('/getfechas', (req, res) => { //OBTIENE LAS ÚLTIMAS FECHAS PARA POPULAR EL FRON-END
     funcSQL.getFechas().then(result => {
        res.status(200);
        res.json(result[0]);
@@ -27,7 +26,7 @@ app.get('/incidencias', (req, res) => {
     })
 });
 
-app.post("/limites", (req, res) => {
+app.post("/limites", (req, res) => { //MODIFICA LOS LIMITES DEL TRIGGER SQL
   console.log('He recibido datos:', req.body)
   funcSQL.setLimites(req.body).then(result => {
     if (result == true){
@@ -44,63 +43,20 @@ app.get("/", (req, res) => {
   res.send("Estás conectado con el back-end");
 });
 
-app.post("/formulario", (req, res) => {
-  const request = new sql.Request(pool);
-  var recibido = req.body;
-  console.log('He recibido datos:', recibido);
-  request.query(`SELECT * FROM DB1 WHERE DateTime = '${recibido.fecha}'`, (err, result) => {
-      if(err){
-        console.error(err);
-      }
-      if (result.rowsAffected >= 1){
-        console.log("Encontrado valor con esa fecha")
-        modificar(recibido,res)
-      }else {
-        console.log("No encontrado valor con esa fecha")
-        res.status(400).send('No se ha encontrado la fecha');
-      }
-  });
+app.post("/incidencia", (req, res) => { //INSERTA UNA NUEVA INCIDENCIA MODIFICANDO LA TABLA
+  console.log('He recibido incidencia:', req.body);
+  funcSQL.searchFechas(req.body).then(result => {
+    if (result[0].length > 0){ //Los valores estan contenidos en la posicion 0
+      console.log("Encontrado valor con esa fecha: ", result[0].length)
+      funcSQL.setIncidencia(req.body).then(result => {
+        if(result>0){
+          res.status(200).send('Correcto');
+        } else {res.status(400).send('Error');}
+      });
+    }
+    else{res.status(400).send('No se ha encontrado la fecha');}
+     console.log("Petición incidencias atendida");
+  })
 });
-
-function modificar(recibido,res) {
-  if(recibido.atributo !== '' && recibido.valor !== ''){ //ES UNA OPERACIÓN DE MODIFICAR DATOS?
-    cambiar = true;
-  }else{cambiar = false;}
-  if(recibido.comentario !== ''){ //ES UNA OPERACIÓN DE COMENTAR LA INCIDENCIA?
-    comentar = true;
-  }else{comentar = false;}
-
-  try{
-    var query = '';
-    var cambiar_query = `UPDATE DB1 SET ${recibido.atributo} = '${recibido.valor}' WHERE DateTime = '${recibido.fecha}';`;
-    var comentar_query = `UPDATE DB1 SET Comentario = '${recibido.comentario}' WHERE DateTime = '${recibido.fecha}';`;
-    var ambas_query = `UPDATE DB1 SET Comentario = '${recibido.comentario}', ${recibido.atributo} = '${recibido.valor}' WHERE DateTime = '${recibido.fecha}';`;
-    if(cambiar == true && comentar == true){ //DEPENDIENDO DE LA OPERACIÓN A REALIZAR HACE UNA QUERY U OTRA
-      query = ambas_query;
-
-    }else if (cambiar == true && comentar == false) {
-      query = cambiar_query;
-    }else{query = comentar_query;}
-    const request = new sql.Request(pool);
-    console.log(query);
-    request.query(query, (err, result) => {
-        if(err){
-          console.error(err);
-        }
-        //SE HA PODIDO MODIFICAR EL VALOR
-        if (result.rowsAffected >= 1){
-          console.log("Valor modificado con éxito")
-          res.status(200).send('OK');
-        }else{
-          res.status(400).send('Bad Request');
-        }
-
-    });
-  }catch(err){
-    res.status(400).send('Bad Request');
-    console.error(err)
-  }
-
-}
 
 app.listen(PORT, console.log(`Servidor funcionando en puerto: ${PORT}`));

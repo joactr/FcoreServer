@@ -7,7 +7,9 @@ const { Connection, Request } = require("tedious"),
  module.exports = { //HACE QUE LAS FUNCIONES SEAN VISIBLES FUERA DEL ARCHIVO
      getFechas: getFechas,
      setLimites: setLimites,
-     setTrigger: setTrigger
+     setTrigger: setTrigger,
+     searchFechas: searchFechas,
+     setIncidencia: setIncidencia
  }
 const pool = new sql.ConnectionPool(config);
 
@@ -33,6 +35,48 @@ async function setLimites(recibido) {
         console.log(error);
         return false;
     }
+}
+
+async function searchFechas(recibido) {
+  try {
+      let pool = await sql.connect(config);
+      let fechas = await pool.request().query(`SELECT * FROM DB1 WHERE DateTime = '${recibido.fecha}'`);
+      return fechas.recordsets;
+  }
+  catch (error) {
+      console.log(error);
+  }
+}
+
+async function setIncidencia(recibido) {
+  try {
+    var query = '';
+    var cambiar_query = `UPDATE DB1 SET ${recibido.atributo} = '${recibido.valor}' WHERE DateTime = '${recibido.fecha}';`;
+    var comentar_query = `UPDATE DB1 SET Comentario = '${recibido.comentario}' WHERE DateTime = '${recibido.fecha}';`;
+    var ambas_query = `UPDATE DB1 SET Comentario = '${recibido.comentario}', ${recibido.atributo} = '${recibido.valor}' WHERE DateTime = '${recibido.fecha}';`;
+
+    if(recibido.atributo !== '' && recibido.valor !== ''){ //ES UNA OPERACIÓN DE MODIFICAR DATOS?
+      cambiar = true;
+    }else{cambiar = false;}
+    if(recibido.comentario !== ''){ //ES UNA OPERACIÓN DE COMENTAR LA INCIDENCIA?
+      comentar = true;
+    }else{comentar = false;}
+
+    if(cambiar == true && comentar == true){ //DEPENDIENDO DE LA OPERACIÓN A REALIZAR HACE UNA QUERY U OTRA
+      query = ambas_query;
+      console.log("ambas")
+    }else if (cambiar == true && comentar == false) {
+      query = cambiar_query;
+      console.log("modificar datos")
+    }else{query = comentar_query;
+    console.log("comentar")}
+    let pool = await sql.connect(config);
+    let request = await pool.request().query(query);
+    return request.rowsAffected;
+  }
+  catch (error) {
+    console.log(error);
+  }
 }
 
 async function setTrigger(recibido){

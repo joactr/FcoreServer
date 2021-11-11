@@ -26,6 +26,7 @@ app.get('/getfechas', (req, res) => { //OBTIENE LAS ÚLTIMAS FECHAS PARA POPULAR
     })
 });
 
+//Recibe "atributo" y max/min (o ambos)
 app.post("/limites", (req, res) => { //MODIFICA LOS LIMITES DEL TRIGGER SQL
   console.log('He recibido datos:', req.body)
   funcSQL.setLimites(req.body).then(result => {

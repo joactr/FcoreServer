@@ -25,7 +25,7 @@
       SET @temp_offset_min = 14;
       SET @vib_offset_max = 7;
       SET @vib_offset_min = 6;
-      SET @piezas_offset_max = 4;
+      SET @piezas_offset_max = 3;
       SET @piezas_offset_min = 6;
       SET @horas_offset_max = 1;
       SET @horas_offset_min = 3;

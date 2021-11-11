@@ -1,8 +1,8 @@
 const config = {
   user: 'dbadmin',
   password: 'Tay03146',
-  server: 'databasejoactr.database.windows.net',
-  database: 'joactrdb',
+  server: 'sqlenira1.database.windows.net',
+  database: 'powerAutomate',
   pool: {
     max: 5,
     min: 2,

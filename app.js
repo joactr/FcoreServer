@@ -7,6 +7,7 @@ const sql = require('mssql')
  bodyParser = require("body-parser"),
  jwt = require('jsonwebtoken'),
  funcSQL = require('./funcSQL.js'),
+ funcAux = require('./funcAux.js'),
  cors = require('cors'),
  router = express.Router();
  PORT = process.env.PORT || 8080;
@@ -44,6 +45,7 @@ app.get("/", (req, res) => {
   res.send("Estás conectado con el back-end de factorybi");
 });
 
+//Recibe fecha, y un comentario / atributo + valor
 app.post("/incidencia", (req, res) => { //INSERTA UNA NUEVA INCIDENCIA MODIFICANDO LA TABLA
   console.log('He recibido incidencia:', req.body);
   funcSQL.searchFechas(req.body).then(result => {
@@ -59,5 +61,22 @@ app.post("/incidencia", (req, res) => { //INSERTA UNA NUEVA INCIDENCIA MODIFICAN
      console.log("Petición incidencias atendida");
   })
 });
+
+
+app.post("/setReporteBI", (req, res) => { //Cambia el link del reporte power BI
+  fs.writeFileSync("reporte.txt", req.body, function (err) {
+      if (err) {
+          console.log("An error occured while writing Object to File.");
+          return console.log(err);
+    }});
+});
+
+
+app.get("/getReporteBI", (req, res) => { //Obtiene el link reporte power BI almacenado
+
+
+
+});
+
 
 app.listen(PORT, console.log(`Servidor funcionando en puerto: ${PORT}`));

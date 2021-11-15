@@ -19,7 +19,7 @@ function savevarsmin (atributo, newval, m){
       m.compresor_offset_min = nuevoVal;
       break;
     default:
-      console.error("No se ha introducido atributo en functest.js");
+      console.error("No se ha introducido atributo en funcAux.js");
 }}
 
 /*Función que edita el valor máximo del trigger de la variable "atributo" con el valor "newval"*/

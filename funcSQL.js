@@ -1,7 +1,7 @@
 const { Connection, Request } = require("tedious"),
  config = require("./dbconfig.js"),
  sql = require('mssql'),
- func = require('./functest.js'),
+ func = require('./funcAux.js'),
  fs = require('fs');
  var cambiar,comentar = false; //¿Hay un resultado con la fecha introducida?
  module.exports = { //HACE QUE LAS FUNCIONES SEAN VISIBLES FUERA DEL ARCHIVO

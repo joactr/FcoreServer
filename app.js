@@ -64,11 +64,15 @@ app.post("/incidencia", (req, res) => { //INSERTA UNA NUEVA INCIDENCIA MODIFICAN
 
 
 app.post("/setReporteBI", (req, res) => { //Cambia el link del reporte power BI
-  fs.writeFileSync("reporte.txt", req.body, function (err) {
-      if (err) {
-          console.log("An error occured while writing Object to File.");
-          return console.log(err);
-    }});
+  if (req.body.link){
+    fs.writeFileSync("reporte.txt", req.body.link, function (err) {
+        if (err) {
+            console.log("An error occured while writing Object to File.");
+            res.status(400).send('Error al escribir link PowerBI');
+      }});
+      res.status(200).send('Correcto');
+      console.log("Cambiado link PowerBI");
+  }else{res.status(400).send('Error al escribir link PowerBI');}
 });
 
 

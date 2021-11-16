@@ -77,8 +77,9 @@ app.post("/setReporteBI", (req, res) => { //Cambia el link del reporte power BI
 
 
 app.get("/getReporteBI", (req, res) => { //Obtiene el link reporte power BI almacenado
-
-
+    var link = fs.readFileSync("reporte.txt").toString();
+    console.log(link);
+    res.status(200).json(link);
 
 });
 

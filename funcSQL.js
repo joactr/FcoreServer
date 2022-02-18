@@ -17,7 +17,7 @@ const pool = new sql.ConnectionPool(config);
 async function getFechas() {
     try {
         let pool = await sql.connect(config);
-        let fechas = await pool.request().query(`SELECT TOP 15 Datetime FROM DB1 ORDER BY DateTime DESC`);
+        let fechas = await pool.request().query(`SELECT TOP 15 Datetime, Vibraciones FROM DB1 ORDER BY DateTime DESC`);
         return fechas.recordsets;
     }
     catch (error) {

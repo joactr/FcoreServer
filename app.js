@@ -19,8 +19,8 @@ const sql = require('mssql')
 
  const pool = new sql.ConnectionPool(config);
 
-app.get('/getfechas', (req, res) => { //OBTIENE LAS ÚLTIMAS FECHAS PARA POPULAR EL FRON-END
-    funcSQL.getFechas().then(result => {
+app.get('/getfechas', (req, res) => { //OBTIENE LAS ÚLTIMAS FECHAS PARA POPULAR EL FRONT-END
+    funcSQL.getFechas(req.body).then(result => {
        res.status(200);
        res.json(result[0]);
        console.log("Petición incidencias atendida");

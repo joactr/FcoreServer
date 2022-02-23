@@ -14,10 +14,10 @@ const { Connection, Request } = require("tedious"),
 const pool = new sql.ConnectionPool(config);
 
 //Función que devuelve las primeras 10 fechas de la BD para popular dropdowns
-async function getFechas() {
+async function getFechas(tabla) {
     try {
         let pool = await sql.connect(config);
-        let fechas = await pool.request().query(`SELECT TOP 15 Datetime, Vibraciones FROM DB1 ORDER BY DateTime DESC`);
+        let fechas = await pool.request().query(`SELECT TOP 15 Timestamp, [Duracion Paro(s)] FROM ${tabla} ORDER BY DateTime DESC`);
         return fechas.recordsets;
     }
     catch (error) {

@@ -17,7 +17,8 @@ const pool = new sql.ConnectionPool(config);
 async function getFechas(tabla) {
     try {
         let pool = await sql.connect(config);
-        let fechas = await pool.request().query(`SELECT TOP 15 Timestamp, [Duracion Paro(s)] FROM ${tabla} ORDER BY DateTime DESC`);
+        let fechas = await pool.request().query(`SELECT TOP 15 Timestamp, [Duracion Paro(s)] FROM ${tabla}
+            WHERE Paro is not NULL ORDER BY Timestamp DESC`);
         return fechas.recordsets;
     }
     catch (error) {

@@ -20,7 +20,8 @@ const sql = require('mssql')
  const pool = new sql.ConnectionPool(config);
 
 app.get('/getfechas', (req, res) => { //OBTIENE LAS ÚLTIMAS FECHAS PARA POPULAR EL FRONT-END
-    funcSQL.getFechas(req.body).then(result => {
+  console.log("hola")
+    funcSQL.getFechas("Piloto").then(result => {
        res.status(200);
        res.json(result[0]);
        console.log("Petición incidencias atendida");
@@ -80,9 +81,7 @@ app.post("/setReporteBI", (req, res) => { //Cambia el link del reporte power BI
 app.get("/getReporteBI", (req, res) => { //Obtiene el link reporte power BI almacenado
   console.log("Obtiene el link reporte power BI")
     var link = fs.readFileSync("reporte.txt").toString();
-    console.log(link);
     res.status(200).json(link);
-
 });
 
 

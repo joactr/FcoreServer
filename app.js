@@ -9,22 +9,76 @@ const sql = require('mssql')
  funcSQL = require('./funcSQL.js'),
  funcAux = require('./funcAux.js'),
  cors = require('cors'),
+ jwt = require('jsonwebtoken'),
+ bcrypt = require('bcrypt'),
  router = express.Router();
+
  PORT = process.env.PORT || 8080;
  app.use(bodyParser.urlencoded({ extended: true }));
  app.use(bodyParser.json());
- app.use(bodyParser.raw());
  app.use(router);
  app.use(cors());
+ app.use(cors({ credentials:true, origin:['http://localhost:3000','https://serraenvasfcore-es.herokuapp.com']}));
 
  const pool = new sql.ConnectionPool(config);
 
-app.get('/getfechas', (req, res) => { //OBTIENE LAS ÚLTIMAS FECHAS PARA POPULAR EL FRONT-END
-  console.log("hola")
+app.use("/", (req, res, next) => {
+  try {
+    console.log("Recibido");
+    if (req.path == "/login" || req.path == "/register" || req.path == "/") {
+      next();
+    } else {
+      /* decode jwt token if authorized*/
+      jwt.verify(req.headers.token, 'Incre1bleclav3muy.segu,raXm!3.1', function (err, decoded) {
+        console.log(decoded);
+        if (decoded && decoded.user) {
+          req.user = decoded;
+          next();
+        } else {
+          return res.status(401).json({
+            errorMessage: 'User unauthorized!',
+            status: false
+          });
+        }
+      })
+    }
+  } catch (e) {
+    res.status(400).send();
+  }
+})
+
+app.post("/login", (req, res) => {
+  funcSQL.login(req.body).then(result => {
+    if (result.length == 1){
+      var datos = result[0][0];
+      console.log(datos)
+      if(bcrypt.compareSync(datos.password, req.body.password)){
+        checkUserAndGenerateToken(datos, req, res);
+      }else{res.status(400).send();}
+    }else{res.status(400).send();}
+  })
+})
+
+function checkUserAndGenerateToken(data, req, res) {
+  jwt.sign({ user: data.username, nivel: data.nivel}, 'Incre1bleclav3muy.segu,raXm!3.1', { expiresIn: '1d' }, (err, token) => {
+    if (err) {
+      res.status(400).json({
+        status: false,
+        errorMessage: err,
+      });
+    } else {
+      res.json({
+        token: token,
+        status: true
+      }).send();
+    }
+  });
+}
+
+app.get('/getfechas', (req, res) => { //OBTIENE LAS ÚLTIMAS FECHAS DE PAROS PARA POPULAR EL FRONT-END
     funcSQL.getFechas("Piloto").then(result => {
        res.status(200);
        res.json(result[0]);
-       console.log("Petición incidencias atendida");
     })
 });
 
@@ -79,9 +133,25 @@ app.post("/setReporteBI", (req, res) => { //Cambia el link del reporte power BI
 
 
 app.get("/getReporteBI", (req, res) => { //Obtiene el link reporte power BI almacenado
-  console.log("Obtiene el link reporte power BI")
     var link = fs.readFileSync("reporte.txt").toString();
     res.status(200).json(link);
+});
+
+app.post("/setPausas", (req, res) => { //Ajusta las pausas del PLC durante las cuales no se calculan KPI's
+    let values = ''
+    for(intervalo of req.body.intervalos){ //Iteramos lo recibido
+      if(intervalo.inicio!=null){values += `(${req.body.linea},'${intervalo.inicio}','${intervalo.fin}'),`} //Agregamos los valores no nulos
+    }
+    values = values.replace(/,$/, ""); // Quita la última coma para la query
+    funcSQL.borrarPausasLinea(req.body.linea).then(result => { //Se borran las pausas anteriores de la misma línea (quita interferencias)
+      if (result){
+        funcSQL.setPausas(values).then(result => { //Insertamos nuevas pausas
+          if(result){res.status(200).send('Correcto');
+          } else {res.status(400).send('Error');}
+        });
+      }else{res.status(400);res.send()}
+       console.log("Pausas cambiadas");
+    })
 });
 
 

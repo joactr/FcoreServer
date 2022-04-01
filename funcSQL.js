@@ -9,7 +9,10 @@ const { Connection, Request } = require("tedious"),
      setLimites: setLimites,
      setTrigger: setTrigger,
      searchFechas: searchFechas,
-     setIncidencia: setIncidencia
+     setIncidencia: setIncidencia,
+     borrarPausasLinea: borrarPausasLinea,
+     setPausas: setPausas,
+     login: login
  }
 const pool = new sql.ConnectionPool(config);
 
@@ -24,6 +27,21 @@ async function getFechas(tabla) {
     catch (error) {
         console.log(error);
     }
+}
+
+async function login(params){
+  let pool = await sql.connect(config);
+  return new Promise((resolve, reject) => {
+    const ps = new sql.PreparedStatement(pool)
+    ps.input('username', sql.VarChar(50))
+    ps.prepare(`SELECT * FROM users WHERE username = @username`, err => {
+        if(err){console.log(err);reject(err);}
+      ps.execute({username: params.username}, (err, result) => {
+        if(err){console.log(err); reject(err);}
+        resolve(result.recordsets)
+      })
+    })
+  })
 }
 
 async function setLimites(recibido) {
@@ -77,6 +95,28 @@ async function setIncidencia(recibido) {
   }
   catch (error) {
     console.log(error);
+  }
+}
+
+async function borrarPausasLinea(linea){
+  try {
+      let pool = await sql.connect(config);
+      let request = await pool.request().query(`DELETE FROM Pausas WHERE linea=${linea}`);
+      return true;
+  }catch (error) {
+      console.log(error);
+      return false;
+  }
+}
+
+async function setPausas(pausas){
+  try {
+      let pool = await sql.connect(config);
+      let request = await pool.request().query(`INSERT INTO Pausas VALUES ${pausas}`);
+      return true;
+  }catch (error) {
+      console.log(error);
+      return false;
   }
 }
 

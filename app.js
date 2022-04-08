@@ -48,15 +48,19 @@ app.use("/", (req, res, next) => {
 })
 
 app.post("/login", (req, res) => {
-  funcSQL.login(req.body).then(result => {
-    if (result.length == 1){
-      var datos = result[0][0];
-      console.log(datos)
-      if(bcrypt.compareSync(datos.password, req.body.password)){
-        checkUserAndGenerateToken(datos, req, res);
-      }else{res.status(400).send();}
+  try{
+    if(req.body.password && req.body.username) {
+      funcSQL.login(req.body).then(result => {
+        if (result.length == 1){
+          var datos = result[0][0];
+          console.log(datos)
+          if(bcrypt.compareSync(datos.password, req.body.password)){
+            checkUserAndGenerateToken(datos, req, res);
+          }else{res.status(400).send();}
+        }else{res.status(400).send();}
+      })
     }else{res.status(400).send();}
-  })
+  }catch(err){res.status(400).send();}
 })
 
 function checkUserAndGenerateToken(data, req, res) {

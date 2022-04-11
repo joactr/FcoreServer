@@ -73,6 +73,7 @@ function checkUserAndGenerateToken(data, req, res) {
     } else {
       res.json({
         token: token,
+        nivel: data.nivel,
         status: true
       }).send();
     }

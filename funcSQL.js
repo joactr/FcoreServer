@@ -39,6 +39,7 @@ async function login(params){
             if(err){console.log(err);reject(err);}
         ps.execute({username: params.username}, (err, result) => {
             if(err){console.log(err);console.log("ERROR DE TIMEOUT"); reject(err);}
+            ps.unprepare(err => { reject(err);})
             else(resolve(result.recordsets))
           })
         })

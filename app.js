@@ -58,7 +58,7 @@ app.post("/login", (req, res) => {
             checkUserAndGenerateToken(datos, req, res);
           }else{res.status(400).send();}
         }else{res.status(400).send();}
-      }).reject("Timeout")
+      },()=>res.status(400).send();)
     }else{res.status(400).send();}
   }catch(err){res.status(400).send();}
 })

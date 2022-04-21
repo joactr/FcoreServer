@@ -50,7 +50,7 @@ app.use("/", (req, res, next) => {
 app.post("/login", (req, res) => {
   try{
     if(req.body.password && req.body.username) {
-      funcSQL.login(req.body).reject("Timeout").then(result => {
+      funcSQL.login(req.body).then(result => {
         if (result.length == 1){
           var datos = result[0][0];
           console.log(datos)
@@ -58,7 +58,7 @@ app.post("/login", (req, res) => {
             checkUserAndGenerateToken(datos, req, res);
           }else{res.status(400).send();}
         }else{res.status(400).send();}
-      })
+      }).reject("Timeout")
     }else{res.status(400).send();}
   }catch(err){res.status(400).send();}
 })

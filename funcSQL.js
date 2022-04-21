@@ -38,8 +38,8 @@ async function login(params){
         ps.prepare(`SELECT * FROM users WHERE username = @username`, err => {
             if(err){console.log(err);reject(err);}
         ps.execute({username: params.username}, (err, result) => {
-            if(err){console.log(err);console.log("ERROR DE TIMEOUT"); reject(err);}
             ps.unprepare(err => { reject(err);})
+            if(err){console.log(err);console.log("ERROR DE TIMEOUT"); reject(err);}
             else(resolve(result.recordsets))
           })
         })

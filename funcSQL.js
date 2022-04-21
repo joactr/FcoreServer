@@ -30,18 +30,23 @@ async function getFechas(tabla) {
 }
 
 async function login(params){
-  let pool = await sql.connect(config);
-  return new Promise((resolve, reject) => {
-    const ps = new sql.PreparedStatement(pool)
-    ps.input('username', sql.VarChar(50))
-    ps.prepare(`SELECT * FROM users WHERE username = @username`, err => {
-        if(err){console.log(err);reject(err);}
-      ps.execute({username: params.username}, (err, result) => {
-        if(err){console.log(err); reject(err);}
-        resolve(result.recordsets)
+  try {
+      let pool = await sql.connect(config);
+      return new Promise((resolve, reject) => {
+        const ps = new sql.PreparedStatement(pool)
+        ps.input('username', sql.VarChar(50))
+        ps.prepare(`SELECT * FROM users WHERE username = @username`, err => {
+            if(err){console.log(err);reject(err);}
+          ps.execute({username: params.username}, (err, result) => {
+            if(err){console.log(err); reject(err);}
+            resolve(result.recordsets)
+          })
+        })
       })
-    })
-  })
+  }catch (error) {
+      console.log(error);
+      reject(error);
+  }
 }
 
 async function setLimites(recibido) {

@@ -18,19 +18,19 @@ const sql = require('mssql')
  app.use(bodyParser.json());
  app.use(router);
  app.use(cors());
- app.use(cors({ credentials:true, origin:['http://localhost:3000','https://serraenvasfcore-es.herokuapp.com']}));
+ app.use(cors({ credentials:true, origin:['http://localhost:3000','https://serraenvasfcore-es.herokuapp.com',
+    'https://virosque-mockup.herokuapp.com']}));
 
  const pool = new sql.ConnectionPool(config);
 
 app.use("/", (req, res, next) => {
   try {
-    console.log("Recibido");
-    if (req.path == "/login" || req.path == "/register" || req.path == "/") {
+    console.log("Recibida petición");
+    if (req.path == "/login" || req.path == "/") {
       next();
     } else {
       /* decode jwt token if authorized*/
       jwt.verify(req.headers.token, 'Incre1bleclav3muy.segu,raXm!3.1', function (err, decoded) {
-        console.log(decoded);
         if (decoded && decoded.user) {
           req.user = decoded;
           next();
@@ -64,7 +64,7 @@ app.post("/login", (req, res) => {
 })
 
 function checkUserAndGenerateToken(data, req, res) {
-  jwt.sign({ user: data.username, nivel: data.nivel}, 'Incre1bleclav3muy.segu,raXm!3.1', { expiresIn: '1d' }, (err, token) => {
+  jwt.sign({ user: data.username, nivel: data.nivel}, 'Incre1bleclav3muy.segu,raXm!3.1', {}, (err, token) => {
     if (err) {
       res.status(400).json({
         status: false,
@@ -134,6 +134,26 @@ app.post("/setReporteBI", (req, res) => { //Cambia el link del reporte power BI
       res.status(200).send('Correcto');
       console.log("Cambiado link PowerBI");
   }else{res.status(400).send('Error al escribir link PowerBI');}
+});
+
+app.post("/setReporteMonitTR", (req, res) => { //Cambia el link del reporte power BI
+  if (req.body.link && req.body.linea && req.body.proceso){
+    var file_content = fs.readFileSync('powerbi.json');
+    var content = JSON.parse(file_content);
+    content[req.body.linea][req.body.proceso] = req.body.link; //Edita el valor del link necesario
+    fs.writeFileSync("powerbi.json", JSON.stringify(content), function (err) {
+        if (err) {
+            console.log("An error occured while writing Object to File.");
+            res.status(400).send('Error al escribir link PowerBI');
+      }});
+      res.status(200).send('Correcto');
+  }else{res.status(400).send('Error al escribir link PowerBI');}
+});
+
+
+app.get("/getReporteMonitTR", (req, res) => { //Obtiene el link reporte power BI almacenado
+    var link = fs.readFileSync("powerbi.json").toString();
+    res.status(200).json(link);
 });
 
 

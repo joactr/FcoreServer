@@ -37,9 +37,9 @@ async function login(params){
         ps.input('username', sql.VarChar(50))
         ps.prepare(`SELECT * FROM users WHERE username = @username`, err => {
             if(err){console.log(err);reject(err);}
-          ps.execute({username: params.username}, (err, result) => {
+        ps.execute({username: params.username}, (err, result) => {
             if(err){console.log(err);console.log("ERROR DE TIMEOUT"); reject(err);}
-            resolve(result.recordsets)
+            else(resolve(result.recordsets))
           })
         })
       })

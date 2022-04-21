@@ -50,7 +50,7 @@ app.use("/", (req, res, next) => {
 app.post("/login", (req, res) => {
   try{
     if(req.body.password && req.body.username) {
-      funcSQL.login(req.body).then(result => {
+      funcSQL.login(req.body).reject("Timeout").then(result => {
         if (result.length == 1){
           var datos = result[0][0];
           console.log(datos)

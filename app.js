@@ -11,7 +11,10 @@ const sql = require('mssql')
  cors = require('cors'),
  jwt = require('jsonwebtoken'),
  bcrypt = require('bcrypt'),
+ MongoClient = require('mongodb').MongoClient,
  router = express.Router();
+
+ const url = `mongodb+srv://enira:Tay03146@cluster0.fjpyi.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 
  PORT = process.env.PORT || 8080;
  app.use(bodyParser.urlencoded({ extended: true }));
@@ -23,7 +26,19 @@ const sql = require('mssql')
 
  const pool = new sql.ConnectionPool(config);
 
-app.use("/", (req, res, next) => {
+
+ MongoClient.connect(url, (err, client) => {
+    var db = client.db('reportes');
+    var num= 1
+    var cal = "cuadradillo"
+    db.collection("monitorizacion").updateOne({},{$set:{[`${num}.${cal}`]:`hueviño22432`}}, function(err, res) {
+      if(err) console.log(err)
+      console.log("Hecho")
+      client.close()
+    })
+  });
+
+app.use("/", (req, res, next) => { //Caso base
   try {
     console.log("Recibida petición");
     if (req.path == "/login" || req.path == "/") {

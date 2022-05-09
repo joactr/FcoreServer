@@ -27,17 +27,6 @@ const sql = require('mssql')
  const pool = new sql.ConnectionPool(config);
 
 
- MongoClient.connect(url, (err, client) => {
-    var db = client.db('reportes');
-    var num= 1
-    var cal = "cuadradillo"
-    db.collection("monitorizacion").updateOne({},{$set:{[`${num}.${cal}`]:`hueviño22432`}}, function(err, res) {
-      if(err) console.log(err)
-      console.log("Hecho")
-      client.close()
-    })
-  });
-
 app.use("/", (req, res, next) => { //Caso base
   try {
     console.log("Recibida petición");
@@ -153,22 +142,27 @@ app.post("/setReporteBI", (req, res) => { //Cambia el link del reporte power BI
 
 app.post("/setReporteMonitTR", (req, res) => { //Cambia el link del reporte power BI
   if (req.body.link && req.body.linea && req.body.proceso){
-    var file_content = fs.readFileSync('powerbi.json');
-    var content = JSON.parse(file_content);
-    content[req.body.linea][req.body.proceso] = req.body.link; //Edita el valor del link necesario
-    fs.writeFileSync("powerbi.json", JSON.stringify(content), function (err) {
-        if (err) {
-            console.log("An error occured while writing Object to File.");
-            res.status(400).send('Error al escribir link PowerBI');
-      }});
-      res.status(200).send('Correcto');
+    MongoClient.connect(url, (err, client) => {
+      var db = client.db('reportes');
+      db.collection("monitorizacion").updateOne({},{$set:{[`${req.body.linea}.${req.body.proceso}`]:`${req.body.link}`}}
+        , function(err, retorno) {
+        if(err) console.log(err)
+        client.close()
+        res.status(200).send('Correcto');
+      })
+    });
   }else{res.status(400).send('Error al escribir link PowerBI');}
 });
 
 
-app.get("/getReporteMonitTR", (req, res) => { //Obtiene el link reporte power BI almacenado
-    var link = fs.readFileSync("powerbi.json").toString();
-    res.status(200).json(link);
+app.get("/getReporteMonitTR", (req, res) => { //Obtiene el link de reportes power BI almacenados
+    MongoClient.connect(url, (err, client) => {
+      var db = client.db('reportes');
+      db.collection("monitorizacion").findOne().then(result => {
+        client.close()
+        res.status(200).json(result);
+      })
+    });
 });
 
 

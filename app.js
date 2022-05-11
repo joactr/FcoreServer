@@ -165,6 +165,31 @@ app.get("/getReporteMonitTR", (req, res) => { //Obtiene el link de reportes powe
     });
 });
 
+app.post("/setReporteMonitTRFCore", (req, res) => { //Cambia el link del reporte power BI
+  if (req.body.link && req.body.tipo){
+    MongoClient.connect(url, (err, client) => {
+      var db = client.db('reportes');
+      db.collection("monitorizacionFcore").updateOne({},{$set:{[`${req.body.tipo}`]:`${req.body.link}`}}
+        , function(err, retorno) {
+        if(err) console.log(err)
+        client.close()
+        res.status(200).send('Correcto');
+      })
+    });
+  }else{res.status(400).send('Error al escribir link PowerBI');}
+});
+
+
+app.get("/getReporteMonitTRFCore", (req, res) => { //Obtiene el link de reportes power BI almacenados
+    MongoClient.connect(url, (err, client) => {
+      var db = client.db('reportes');
+      db.collection("monitorizacionFcore").findOne().then(result => {
+        client.close()
+        res.status(200).json(result);
+      })
+    });
+});
+
 
 app.get("/getReporteBI", (req, res) => { //Obtiene el link reporte power BI almacenado
     var link = fs.readFileSync("reporte.txt").toString();

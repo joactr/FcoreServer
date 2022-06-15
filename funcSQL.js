@@ -12,7 +12,8 @@ const { Connection, Request } = require("tedious"),
      setIncidencia: setIncidencia,
      borrarPausasLinea: borrarPausasLinea,
      setPausas: setPausas,
-     login: login
+     login: login,
+     getVirosque: getVirosque
  }
 const pool = new sql.ConnectionPool(config);
 

@@ -213,5 +213,12 @@ app.post("/setPausas", (req, res) => { //Ajusta las pausas del PLC durante las c
     })
 });
 
+app.get('/getVirosque', (req, res) => { //OBTIENE LAS ÚLTIMAS FECHAS DE PAROS PARA POPULAR EL FRONT-END
+    funcSQL.getVirosque().then(result => {
+       res.status(200);
+       res.json(result[0]);
+    })
+});
+
 
 app.listen(PORT, console.log(`Servidor funcionando en puerto: ${PORT}`));

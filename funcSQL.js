@@ -29,6 +29,17 @@ async function getFechas(tabla) {
     }
 }
 
+async function getVirosque() {
+    try {
+        let pool = await sql.connect(config);
+        let res = await pool.request().query(`SELECT TOP 15 * FROM Virosque`);
+        return res.recordsets;
+    }
+    catch (error) {
+        console.log(error);
+    }
+}
+
 async function login(params){
   try {
       let pool = await sql.connect(config);

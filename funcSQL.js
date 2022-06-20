@@ -12,8 +12,7 @@ const { Connection, Request } = require("tedious"),
      setIncidencia: setIncidencia,
      borrarPausasLinea: borrarPausasLinea,
      setPausas: setPausas,
-     login: login,
-     getVirosque: getVirosque
+     login: login
  }
 const pool = new sql.ConnectionPool(config);
 
@@ -24,17 +23,6 @@ async function getFechas(tabla) {
         let fechas = await pool.request().query(`SELECT TOP 15 Timestamp, [Duracion Paro(s)] FROM ${tabla}
             WHERE [Duracion Paro(s)] is not NULL ORDER BY Timestamp DESC`);
         return fechas.recordsets;
-    }
-    catch (error) {
-        console.log(error);
-    }
-}
-
-async function getVirosque() {
-    try {
-        let pool = await sql.connect(config);
-        let res = await pool.request().query(`SELECT TOP 15 * FROM Virosque`);
-        return res.recordsets;
     }
     catch (error) {
         console.log(error);

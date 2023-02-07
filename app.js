@@ -12,6 +12,7 @@ const sql = require('mssql')
  jwt = require('jsonwebtoken'),
  bcrypt = require('bcrypt'),
  MongoClient = require('mongodb').MongoClient,
+ axios = require('axios'),
  router = express.Router();
 
  const url = `mongodb+srv://enira:Tay03146@cluster0.fjpyi.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
@@ -29,7 +30,6 @@ const sql = require('mssql')
 
 app.use("/", (req, res, next) => { //Caso base
   try {
-    console.log("Recibida petición");
     if (req.path == "/login" || req.path == "/") {
       next();
     } else {
@@ -39,6 +39,7 @@ app.use("/", (req, res, next) => { //Caso base
           req.user = decoded;
           next();
         } else {
+          //console.log("Usuario no autorizado");
           return res.status(401).json({
             errorMessage: 'User unauthorized!',
             status: false
@@ -53,6 +54,7 @@ app.use("/", (req, res, next) => { //Caso base
 
 app.post("/login", (req, res) => {
   try{
+    console.log(req.body)
     if(req.body.password && req.body.username) {
       funcSQL.login(req.body).then(result => {
         if (result.length == 1){
@@ -128,7 +130,6 @@ app.post("/incidencia", (req, res) => { //INSERTA UNA NUEVA INCIDENCIA MODIFICAN
 
 
 app.post("/setReporteBI", (req, res) => { //Cambia el link del reporte power BI
-
   if (req.body.link){
     fs.writeFileSync("reporte.txt", req.body.link, function (err) {
         if (err) {
@@ -211,6 +212,25 @@ app.post("/setPausas", (req, res) => { //Ajusta las pausas del PLC durante las c
       }else{res.status(400);res.send()}
        console.log("Pausas cambiadas");
     })
+});
+
+app.post("/postFlujo", (req, res) => { //Agrega un nuevo flujo
+try {
+  console.log(req.body)
+  axios.post('http://localhost:1880/test', {
+    var:"count1",
+    max:parseFloat(req.body.max),
+    min:parseFloat(req.body.min)
+  })
+  .then(function (response) {
+    res.status(200).send('Correcto');
+  })
+  .catch(function (error) {
+    console.log(error);
+    res.status(400).send('Incorrecto');
+  });
+
+}catch (err) {console.log(err)}
 });
 
 
